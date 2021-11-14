@@ -1,7 +1,5 @@
 '''
-Creator: Lorenzo Swaby
-Date: 10/23/2021
-Description: Creates/Modify Json files for data storage
+Creates/Updates Json files for data storage
 '''
 
 import json
@@ -23,6 +21,6 @@ class JsonManager:
     
     def addToJsonFile(self, data):
         with open(self.fileName, "w") as write_file:
-            json.dump(data, write_file)
+            json.dump(data, write_file, indent=4)
         write_file.close()
         

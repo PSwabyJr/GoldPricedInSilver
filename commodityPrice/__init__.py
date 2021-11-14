@@ -1,1 +1,1 @@
-from .import priceCollector
+from . import priceCollector

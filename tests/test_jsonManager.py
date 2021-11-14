@@ -7,6 +7,7 @@ from jsonFormatter.jsonManager import JsonManager
 
 class TestJsonManager(unittest.TestCase):
     def setUp(self):
+        print(sys.path)
         self.func= JsonManager('test.json')   
     
     def testVerifyFileDoesntExist(self):

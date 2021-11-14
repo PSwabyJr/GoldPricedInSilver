@@ -1,15 +1,15 @@
 #TODO: Other Functions will need to be added and imports for this class
+#TODO: Description needs to be added as well
 import os
 import sys
 import datetime
-from os.path import exists as file_exists
-
 SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
 sys.path.append(os.path.dirname(SCRIPT_DIR))
 
+from os.path import exists as file_exists
 from jsonFormatter.jsonManager import JsonManager
 from dataProcessing.priceProcessing import PriceProcessor
-from commodityPrice.priceCollector import getCommodityPricing
+from commodityPrice.priceCollector import getPricing
 
 class GoldPricedInSilver:
     def __init__(self, fileName):
@@ -21,7 +21,7 @@ class GoldPricedInSilver:
             jsonHeader["GoldPricedInSilver"] = []
             self.jsonManager.addToJsonFile(jsonHeader)
     def addNewPrice(self):
-        goldPrice,silverPrice = getCommodityPricing()
+        goldPrice,silverPrice = getPricing()
         goldConvertedPrice = goldPrice/silverPrice
         self.processor.addToList(goldConvertedPrice)
     def saveNewData(self):
@@ -35,6 +35,13 @@ class GoldPricedInSilver:
         jsonData["GoldPricedInSilver"].append(newData)
         self.jsonManager.addToJsonFile(jsonData)
         self.processor.resetProcessor()
+
+if __name__ == '__main__':
+    beginningObj = GoldPricedInSilver('test.json')
+    beginningObj.addNewPrice()
+    beginningObj.addNewPrice()
+    beginningObj.addNewPrice()
+    beginningObj.saveNewData()
 
 
 

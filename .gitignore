@@ -1,3 +1,5 @@
 tests/__pycache__/__init__.cpython-39.pyc
 tests/__pycache__/test_jsonManager.cpython-39.pyc
-
+main/__pycache__/jsonManager.cpython-39.pyc
+main/__pycache__/priceCollector.cpython-39.pyc
+main/__pycache__/priceProcessing.cpython-39.pyc

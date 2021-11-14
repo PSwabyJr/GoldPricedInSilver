@@ -3,7 +3,7 @@ import unittest
 SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
 sys.path.append(os.path.dirname(SCRIPT_DIR))
 
-from dataProcessing.priceProcessing import PriceProcessor
+from main.priceProcessing import PriceProcessor
 
 class TestPriceProcessor(unittest.TestCase):
     def setUp(self):

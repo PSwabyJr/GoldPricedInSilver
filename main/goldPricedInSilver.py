@@ -3,13 +3,11 @@
 import os
 import sys
 import datetime
-SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
-sys.path.append(os.path.dirname(SCRIPT_DIR))
 
 from os.path import exists as file_exists
-from jsonFormatter.jsonManager import JsonManager
-from dataProcessing.priceProcessing import PriceProcessor
-from commodityPrice.priceCollector import getPricing
+from jsonManager import JsonManager
+from priceProcessing import PriceProcessor
+from priceCollector import getPricing
 
 class GoldPricedInSilver:
     def __init__(self, fileName):
@@ -42,6 +40,3 @@ if __name__ == '__main__':
     beginningObj.addNewPrice()
     beginningObj.addNewPrice()
     beginningObj.saveNewData()
-
-
-

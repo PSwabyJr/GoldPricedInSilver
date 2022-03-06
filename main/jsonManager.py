@@ -1,12 +1,19 @@
 '''
 Creates/Updates Json files for data storage
 '''
-
 import json
+from os.path import exists as file_exists
 
-class JsonManager:
-    def __init__(self, fileName):
-        self.fileName= fileName
+class JsonManager:    
+    def __init__(self, fileName, *args, **kwargs):
+        self.fileName = fileName
+        if not file_exists(self.fileName):
+            jsonHeader = {}
+            for titleHeader in args:
+                jsonHeader[titleHeader] = []
+            for titleHeader in kwargs:
+                jsonHeader[titleHeader] = kwargs[titleHeader]
+            self.addToJsonFile(jsonHeader) 
     
     def loadJsonFile(self):
         try:
@@ -15,8 +22,6 @@ class JsonManager:
             read_file.close()
             return data
         except FileNotFoundError as error:
-            #print(error)
-            #print('File name '+ self.fileName + ' does not exist.')
             return -1
     
     def addToJsonFile(self, data):

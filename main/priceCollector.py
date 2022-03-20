@@ -5,10 +5,11 @@ the use of the ThreadPoolExecutor function from the concurrent.futures library.
 import time
 import concurrent.futures
 import requests
-#from apiLinks import forexLinks
+from main.logManager import LogManager
 class PriceCollector:
     def __init__(self, apiLinks):
         self.apiLinks = apiLinks
+        self.log = LogManager('log.txt')
 
     def getForexData(self, apiLink):
         response = requests.get(apiLink)
@@ -41,10 +42,9 @@ class PriceCollector:
                     timeElapsed = currentTime - beginningTime
                     priceResults.clear()
                     if timeElapsed >= 240.0:
-                        print('Could not get pricing within 4 minutes')
+                        self.log.logDebugMessage('PriceCollector Class, getPricing(): Could not get pricing within 4 minutes')
                         priceResults = err
                     continue
                 else:
-                    print('Success')
                     failedAPICall = False
         return priceResults

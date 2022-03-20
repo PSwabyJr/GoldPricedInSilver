@@ -1,9 +1,9 @@
 #TODO: Other Functions will need to be added and imports for this class
 #TODO: Description needs to be added as well
 import datetime
-
 from main.jsonManager import JsonManager
 from main.priceProcessing import PriceProcessor
+from main.logManager import LogManager
 
 class GoldPricedInSilver:
     def __init__(self, *args):
@@ -13,13 +13,25 @@ class GoldPricedInSilver:
         self.cachedFile = args[2]
         self.processor = PriceProcessor()
         self.headerList = ['sum', 'priceList', 'priceListNegative']
+        self.log = LogManager('log.txt')
     
     def _saveToCachedJson(self, data):
         cachedJson = JsonManager(self.cachedFile, *self.headerList)
         cachedData = cachedJson.loadJsonFile()
-        self.processor.setAttributes(cachedData['sum'], cachedData['priceList'], cachedData['priceListNegative'])
-        cachedJson.addToJsonFile(data)
-
+        if cachedData == -1:
+            self.log.logDebugMessage('GoldPricedInSilver Class, _saveToCachedJson(): FileName '+ self.cachedFile + ' not found!!')
+        else:
+            self.processor.setAttributes(cachedData['sum'], cachedData['priceList'], cachedData['priceListNegative'])
+            cachedJson.addToJsonFile(data)    
+        
+    def _getCachedJson(self):
+        cachedJson = JsonManager(self.cachedFile, *self.headerList)
+        cachedData = cachedJson.loadJsonFile()
+        if cachedData == -1:
+            self.log.logDebugMessage('GoldPricedInSilver Class, _saveToCachedJson(): FileName '+ self.cachedFile + ' not found!!')
+        else:
+            self.processor.setAttributes(cachedData['sum'], cachedData['priceList'], cachedData['priceListNegative'])
+        
     def _updatedJsonData(self, list, *args):
         data = {}
         for arg in args:
@@ -47,14 +59,14 @@ class GoldPricedInSilver:
     def addNewPrice(self):
         try:
             results = self.processor.addNewPrice()
-        except Exception:
-            #TODO: will need to print this to a log once we're done
-            print('Failed to retrieve data due to down server')
+        except Exception as err:
+            self.log.logDebugMessage('GoldPricedInSilver class, addNewPrice():Failed to retrieve data due to down server')
         else:
             newData = self._updatedJsonData(results, *self.headerList)
             self._saveToCachedJson(newData)
 
     def saveNewData(self):
+        self._getCachedJson()
         newData = self._createPriceDictionary()
         jsonData = self.jsonManager.loadJsonFile()
         jsonData[self.headerTitle].append(newData)

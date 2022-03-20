@@ -5,6 +5,7 @@ minimum prices. The prices collected will be stored in a Heap structure.
 import heapq
 from main.priceCollector import PriceCollector
 from main.apiLinks import forexLinks
+from main.logManager import LogManager
 class PriceProcessor:
     def __init__(self):
         '''
@@ -29,6 +30,7 @@ class PriceProcessor:
         Forex feed's (https://forex-data-feed.swissquote.com)  API calls.
         '''
         self.priceCollector = PriceCollector(forexLinks)
+        self.log = LogManager('log.txt')
     
     def setAttributes(self, sum, priceList, priceListNegative):
         self.sum = sum
@@ -80,6 +82,7 @@ class PriceProcessor:
         try:
             firstPrice,secondPrice = self.priceCollector.getPricing()
         except Exception as err:
+            self.log.logDebugMessage('PriceProcessor Class, addNewPrice():Failed to retrieve data due to down server')
             return err
         else:
             self.addToList(firstPrice/secondPrice)

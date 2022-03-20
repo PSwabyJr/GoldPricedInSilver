@@ -66,7 +66,7 @@ class TestPriceProcessor(unittest.TestCase):
         mock_get_exception.return_value = Mock()
         mock_get_exception.side_effect = Exception()
         self.func.addNewPrice()
-        self.assertRaises(Exception)
+
  
     def tearDown(self):
         print(f'End of test {self.shortDescription()}\n')

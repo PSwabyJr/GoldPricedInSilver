@@ -13,6 +13,7 @@ from main.goldPricedInSilver import GoldPricedInSilver
 from main.priceProcessing import PriceProcessor
 from os.path import exists as file_exists
 from mockData import expectedResult
+from diagnosticAid import doesStringExistInFile
 import filecmp
 import os 
 
@@ -63,6 +64,8 @@ class TestGoldPricedInSilver(unittest.TestCase):
         mock_get_pricing.return_value = Mock()
         mock_get_pricing.side_effect = Exception()
         self.goldSilverPricing.addNewPrice()
+        result = doesStringExistInFile('log.txt', 'GoldPricedInSilver class, addNewPrice():Failed to retrieve data due to down server')
+        self.assertTrue(result, 'Expected a True reponse')
     
     @patch.object(PriceProcessor, 'addNewPrice')
     def testSaveNewData(self, mock_get_pricing):

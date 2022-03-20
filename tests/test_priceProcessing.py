@@ -8,6 +8,7 @@ from unittest.mock import patch, Mock
 from main.priceProcessing import PriceProcessor
 from main.priceCollector import PriceCollector
 from mockData import priceMockData, expectedResult
+from diagnosticAid import doesStringExistInFile
 class TestPriceProcessor(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
@@ -16,6 +17,7 @@ class TestPriceProcessor(unittest.TestCase):
     @classmethod
     def tearDownClass(cls):
         print(f'End of testing PriceProcessor class')
+        os.remove('log.txt')
     
     def setUp(self):
         print(f'Beginning of test {self.shortDescription()}')
@@ -66,8 +68,9 @@ class TestPriceProcessor(unittest.TestCase):
         mock_get_exception.return_value = Mock()
         mock_get_exception.side_effect = Exception()
         self.func.addNewPrice()
-
- 
+        result = doesStringExistInFile('log.txt', 'PriceProcessor Class, addNewPrice():Failed to retrieve data due to down server')
+        self.assertTrue(result, 'Expected a True reponse')
+        
     def tearDown(self):
         print(f'End of test {self.shortDescription()}\n')
 

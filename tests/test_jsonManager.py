@@ -1,3 +1,7 @@
+""" 
+Unit testing for jsonManager.py
+"""
+
 import os,sys
 import unittest
 SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))

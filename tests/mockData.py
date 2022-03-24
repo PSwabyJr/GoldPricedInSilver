@@ -1,4 +1,6 @@
-#Saves Mock Data for all API testing
+"""
+Saves Mock Data for all API testing
+"""
 
 #forexMockData's source: https://forex-data-feed.swissquote.com/
 forexMockData = [{'topo': {'platform': 'MT5', 'server': 'Live1'}, 'spreadProfilePrices': [{'spreadProfile': 'Premium', 'bidSpread': 5.5, 'askSpread': 5.4, 'bid': 23.0165, 'ask': 23.0654}, {'spreadProfile': 'Prime', 'bidSpread': 5.3, 'askSpread': 5.2, 'bid': 23.0167, 'ask': 23.0652}, {'spreadProfile': 'Standard', 'bidSpread': 5.7, 'askSpread': 5.7, 'bid': 23.0163, 'ask': 23.0657}], 'ts': 1640901590406}, 

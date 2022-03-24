@@ -1,3 +1,7 @@
+""" 
+Unit testing for priceCollector.py
+"""
+
 import os,sys
 import unittest
 from requests_mock import mock

@@ -1,3 +1,6 @@
+"""
+Handles logging messages into log files 
+"""
 from fileinput import filename
 import logging
 

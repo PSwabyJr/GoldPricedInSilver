@@ -1,3 +1,7 @@
+""" 
+Unit testing for goldPricedinSilver.py
+"""
+
 import os,sys
 import unittest
 import datetime

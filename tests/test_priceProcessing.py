@@ -1,3 +1,7 @@
+""" 
+Unit testing for priceProcessing.py
+"""
+
 import os,sys
 import unittest
 

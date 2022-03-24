@@ -1,5 +1,6 @@
-#TODO: Other Functions will need to be added and imports for this class
-#TODO: Description needs to be added as well
+"""
+Manages the saving and adding data of Gold Priced in Silver
+ """
 import datetime
 from main.jsonManager import JsonManager
 from main.priceProcessing import PriceProcessor

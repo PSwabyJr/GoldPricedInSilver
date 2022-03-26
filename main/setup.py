@@ -3,25 +3,29 @@ This script is a setup script for creating files
 goldPricedInSilver.json and cachedData.json for 
 storing data. 
 """
-from jsonManager import JsonManager
 
-if __name__ == '__main__':
+import os,sys
+SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
+sys.path.append(os.path.dirname(SCRIPT_DIR))
+from main.jsonManager import JsonManager
 
-    mainFileName = 'goldPricedInSilver.json' 
+
+def setUpJsonFiles():
+    mainFileName = 'GoldPricedInSilver.json' 
     cachedFileName = 'cachedData.json'
 
-    # Header for goldPricedInSilver.json
+    # Header for GoldPricedInSilver.json
     mainHeader = {}
-    mainHeader['goldpricedInSilver'] = []
+    mainHeader['GoldPricedInSilver'] = []
 
     # Headers for cachedData.json
     cachedDataHeaders = {}
     cachedDataHeaders['sum'] = 0
-    cachedDataHeaders['pricedLists'] = []
-    cachedDataHeaders['priecListsNegative'] = []
+    cachedDataHeaders['priceList'] = []
+    cachedDataHeaders['priceListNegative'] = []
 
     """
-    Using JsonManager to create 'goldPricedInSilver.json' and
+    Using JsonManager to create 'GoldPricedInSilver.json' and
     'cachedData.json.
     """
     mainJsonFile = JsonManager(mainFileName, **mainHeader)

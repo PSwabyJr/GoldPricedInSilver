@@ -59,6 +59,7 @@ class GoldPricedInSilver:
 
     def addNewPrice(self):
         try:
+            self._getCachedJson()
             results = self.processor.addNewPrice()
         except Exception as err:
             self.log.logDebugMessage('GoldPricedInSilver class, addNewPrice():Failed to retrieve data due to down server')

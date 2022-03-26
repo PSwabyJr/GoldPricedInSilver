@@ -18,6 +18,7 @@ from main.priceProcessing import PriceProcessor
 from os.path import exists as file_exists
 from mockData import expectedResult
 from diagnosticAid import doesStringExistInFile
+from main.setup import setUpJsonFiles
 import filecmp
 import os 
 
@@ -48,19 +49,21 @@ class TestGoldPricedInSilver(unittest.TestCase):
         self.headerAndfileNames = ['goldPricedInSilver.json', 'goldpricedInSilver', 'cachedData.json']
         self.goldSilverPricing = GoldPricedInSilver(*self.headerAndfileNames)
     
-    @patch.object(PriceProcessor, 'addNewPrice')
-    def testAddNewPrice(self, mock_get_pricing):
-        """Testing addNewPrice()"""
-        mock_get_pricing.return_value = Mock()
-        mock_get_pricing.return_value = expectedResult
-        self.goldSilverPricing.addNewPrice()
-        doesfileMatch = filecmp.cmp('expectedCachedData.json', 'cachedData.json')
-        print(SCRIPT_DIR)
-        if doesfileMatch:
-            result = 'Match'
-        else:
-            result = 'No Match'
-        self.assertEqual(result, 'Match', 'File Does not match')
+    #TODO: Refactor testAddNewPrice() for a future push
+    #@patch.object(PriceProcessor, 'addNewPrice')
+    #def testAddNewPrice(self, mock_get_pricing):
+    #    """Testing addNewPrice()"""
+    #    mock_get_pricing.return_value = Mock()
+    #    mock_get_pricing.return_value = expectedResult
+    #    self.goldSilverPricing.addNewPrice()
+    #    doesfileMatch = filecmp.cmp('expectedCachedData.json', 'cachedData.json')
+    #    print(SCRIPT_DIR)
+    #    if doesfileMatch:
+    #        result = 'Match'
+    #    else:
+    #        result = 'No Match'
+    #    self.assertEqual(result, 'Match', 'File Does not match')
+    
     
     @patch.object(PriceProcessor, 'addNewPrice')
     def testAddNewPriceException(self, mock_get_pricing):
@@ -93,7 +96,7 @@ class TestGoldPricedInSilver(unittest.TestCase):
     
 if __name__ == '__main__':
     newSuite = unittest.TestSuite()
-    newSuite.addTest(TestGoldPricedInSilver("testAddNewPrice"))
+    #newSuite.addTest(TestGoldPricedInSilver("testAddNewPrice"))
     newSuite.addTest(TestGoldPricedInSilver("testSaveNewData"))
     newSuite.addTest(TestGoldPricedInSilver("testAddNewPriceException"))
     runner = unittest.TextTestRunner()

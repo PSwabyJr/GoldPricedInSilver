@@ -16,3 +16,7 @@ main/__pycache__/logManager.cpython-39.pyc
 main/__pycache__/main.cpython-39.pyc
 main/__pycache__/priceCollector.cpython-38.pyc
 main/__pycache__/priceCollector.cpython-310.pyc
+tests/__pycache__/diagnosticAid.cpython-39.pyc
+tests/__pycache__/mockData.cpython-39.pyc
+tests/__pycache__/diagnosticAid.cpython-39.pyc
+tests/__pycache__/mockData.cpython-39.pyc

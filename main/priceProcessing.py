@@ -1,9 +1,10 @@
 '''
+** Will need to be refactored (Violates SRP) **
 PriceProcessor class used to calculated the average, maximum and 
 minimum prices. The prices collected will be stored in a Heap structure. 
 '''
 import heapq
-from main.priceCollector import PriceCollector
+from main.priceCollector import ForexPriceCollector
 from main.apiLinks import forexLinks
 from main.logManager import LogManager
 class PriceProcessor:
@@ -29,7 +30,7 @@ class PriceProcessor:
         priceCollector: the class for retrieveing the price of gold/silver through 
         Forex feed's (https://forex-data-feed.swissquote.com)  API calls.
         '''
-        self.priceCollector = PriceCollector(forexLinks)
+        self.priceCollector = ForexPriceCollector(forexLinks)
         self.log = LogManager('log.txt')
     
     def setAttributes(self, sum, priceList, priceListNegative):

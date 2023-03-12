@@ -94,6 +94,8 @@ class ForexPriceProcessor(Processor):
             data['priceListNegative'] = self.__priceHeap.getMaxHeap() #TODO: why do we need this again
             return data
 
+
+
 class PriceProcessor:
     def __init__(self):
         '''

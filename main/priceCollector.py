@@ -6,26 +6,32 @@ import time
 import concurrent.futures
 import requests
 from main.logManager import LogManager
-class PriceCollector:
-    def __init__(self, apiLinks):
-        self.apiLinks = apiLinks
-        self.log = LogManager('log.txt')
+from abc import abstractmethod
 
-    def getForexData(self, apiLink):
-        response = requests.get(apiLink)
+class PriceCollector:
+    @abstractmethod
+    def getPricing(self): pass
+
+class DataCollector:
+    @abstractmethod
+    def _getData(self, *args): pass
+
+class ForexPriceCollector(PriceCollector, DataCollector):
+    def __init__(self, apiLinks):
+        self.__apiLinks = apiLinks
+        self.__log = LogManager('log.txt')
+        
+    def _getData(self) -> float:
+        response = requests.get(self.__apiLinks)    
         if response.ok:
-            return response
+            priceData = response.json()
+            MT5ServerPrices = priceData[0]['spreadProfilePrices']
+            # Price Type: 'Premium'= 0, 'Prime' = 1, 'Standard' = 2
+            priceType = 2
+            price = MT5ServerPrices[priceType]['ask']
+            return price
         else:
             return None
-        
-    def getForexDataPrice(self, apiLink) -> float:
-        priceRequest = self.getForexData(apiLink)
-        priceData = priceRequest.json()
-        MT5ServerPrices = priceData[0]['spreadProfilePrices']
-        # Price Type: 'Premium'= 0, 'Prime' = 1, 'Standard' = 2
-        priceType = 2
-        price = MT5ServerPrices[priceType]['ask']
-        return price
 
     def getPricing(self) -> list:
         failedAPICall = True
@@ -35,14 +41,14 @@ class PriceCollector:
         while failedAPICall and timeElapsed < 240.0:
             with concurrent.futures.ThreadPoolExecutor() as executor:
                 try:
-                    for result in executor.map(self.getForexDataPrice, self.apiLinks):
+                    for result in executor.map(self._getData, self.__apiLinks):
                         priceResults.append(result)
                 except Exception as err:
                     currentTime = time.time()
                     timeElapsed = currentTime - beginningTime
                     priceResults.clear()
                     if timeElapsed >= 240.0:
-                        self.log.logDebugMessage('PriceCollector Class, getPricing(): Could not get pricing within 4 minutes')
+                        self.__log.logDebugMessage('PriceCollector Class, getPricing(): Could not get pricing within 4 minutes')
                         priceResults = err
                     continue
                 else:

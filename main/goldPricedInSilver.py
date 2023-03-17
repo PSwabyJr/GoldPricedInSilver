@@ -34,6 +34,15 @@ class GoldPricedInSilver:
             self.log.logDebugMessage('GoldPricedInSilver Class, _saveToCachedJson(): FileName '+ self.cachedFile + ' not found!!')
         else:
             self.processor.setAttributes(cachedData['sum'], cachedData['priceList'], cachedData['priceListNegative'])
+
+    def _clearCacheFile(self):
+        self.processor.resetProcessor()
+        sum, priceList, priceListNegative = self.processor.getAttributes()
+        clearedData = {}
+        clearedData['sum'] = sum
+        clearedData['priceList'] = priceList
+        clearedData['priceListNegative'] = priceListNegative
+        return clearedData
         
     def _updatedJsonData(self, list, *args):
         data = {}
@@ -50,15 +59,6 @@ class GoldPricedInSilver:
         newData['Minimum'] = minPrice
         return newData
     
-    def _clearCacheFile(self):
-        self.processor.resetProcessor()
-        sum, priceList, priceListNegative = self.processor.getAttributes()
-        clearedData = {}
-        clearedData['sum'] = sum
-        clearedData['priceList'] = priceList
-        clearedData['priceListNegative'] = priceListNegative
-        return clearedData
-
     def addNewPrice(self):
         try:
             self._getCachedJson()

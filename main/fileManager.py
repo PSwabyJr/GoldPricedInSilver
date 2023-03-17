@@ -10,7 +10,6 @@ class FileManager(ABC):
     @staticmethod
     def addToFile(filename): pass
 
-
 class JsonManager(FileManager):
 
     @staticmethod

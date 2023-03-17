@@ -5,6 +5,8 @@ prices. Those prices are saved in GoldPricedInSilver.json file.
 Script executed by Windows Scheduler or Chron.
 """
 
+# TODO: re-evaluate this file (it might be deleted)
+
 import os,sys
 SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
 sys.path.append(os.path.dirname(SCRIPT_DIR))

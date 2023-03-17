@@ -4,8 +4,10 @@ Creates/Updates Json files for data storage
 import json
 from os.path import exists as file_exists
 
+# TODO: Eventually will get rid of this file once the new JsonManager with FileManager Interface is fully implemented
 class JsonManager:    
     def __init__(self, fileName, *args, **kwargs):
+        # These lines below violates SRP .... a different object should be responsible in handling the structure of a file and whether it exists
         self.fileName = fileName
         if not file_exists(self.fileName):
             jsonHeader = {}
@@ -28,4 +30,3 @@ class JsonManager:
         with open(self.fileName, "w") as write_file:
             json.dump(data, write_file, indent=4)
         write_file.close()
-        

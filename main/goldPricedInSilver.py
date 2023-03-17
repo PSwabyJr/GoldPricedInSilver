@@ -15,7 +15,7 @@ class GoldPricedInSilver:
         self.jsonManager = JsonManager(self.fileName, self.headerTitle)
         self.cachedFile = args[2]
         self.processor = PriceProcessor()
-        self.headerList = ['sum', 'priceList', 'priceListNegative']
+        self.headerList = ['sum', 'priceList', 'priceListNegative']  # TODO:Suppose headerlist was different for a new change.... 
         self.log = LogManager('log.txt')
     
     def _saveToCachedJson(self, data):

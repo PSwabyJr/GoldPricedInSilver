@@ -6,8 +6,8 @@ minimum prices. The prices collected will be stored in a Heap structure.
 import heapq
 from main.priceCollector import ForexPriceCollector
 from abc import abstractclassmethod
-from main.apiLinks import forexLinks
-from main.logManager import LogManager
+from main.apiLinks import forexLinks  #should be removed
+from main.logManager import LogManager # should be removed
 
 class PriceHeap:
     __priceList = []   # minHeap for storing prices. Used to determine minimum price stored
@@ -72,9 +72,11 @@ class ForexPriceProcessor(Processor):
     __priceAverage = PriceAverage()
     __priceHeap = PriceHeap()
 
-    def __init__(self):        
-        self.priceCollector = ForexPriceCollector(forexLinks)
-        self.log = LogManager('log.txt')
+    def __init__(self, priceCollector, log):        
+        self.priceCollector = priceCollector
+        self.log = log
+        # self.priceCollector = ForexPriceCollector(forexLinks)
+        #self.log = LogManager('log.txt')  Need to go should be in a different class for logging information
     
     def resetProcessor(self):
         self.__priceHeap.resetHeap()

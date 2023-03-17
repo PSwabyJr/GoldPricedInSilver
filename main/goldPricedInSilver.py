@@ -6,6 +6,8 @@ from main.jsonManager import JsonManager
 from main.priceProcessing import PriceProcessor
 from main.logManager import LogManager
 
+# TODO: This straight up violates Single Responsiblity principle... consider a huge restructure of this class.
+
 class GoldPricedInSilver:
     def __init__(self, *args):
         self.fileName = args[0]

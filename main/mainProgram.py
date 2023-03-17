@@ -3,6 +3,7 @@ Collects price information (Gold Priced in Silver Ounces) from
 API (https://forex-data-feed.swissquote.com) and stores data into cachedData.json.
 Script executed by Windows Scheduler or Chron.
 """
+# TODO: re-evaluate this file (it might be deleted)
 
 import os,sys
 SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))

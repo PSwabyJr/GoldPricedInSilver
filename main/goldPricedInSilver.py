@@ -1,79 +1,42 @@
-"""
-Manages the saving and adding data of Gold Priced in Silver
- """
 import datetime
-from main.jsonManager import JsonManager
-from main.priceProcessing import PriceProcessor
-from main.logManager import LogManager
+import time
+from enum import Enum
 
-# TODO: This straight up violates Single Responsiblity principle... consider a huge restructure of this class.
 
-class GoldPricedInSilver:
-    def __init__(self, *args):
-        self.fileName = args[0]
-        self.headerTitle = args[1]
-        self.jsonManager = JsonManager(self.fileName, self.headerTitle)
-        self.cachedFile = args[2]
-        self.processor = PriceProcessor()
-        self.headerList = ['sum', 'priceList', 'priceListNegative']  # TODO:Suppose headerlist was different for a new change.... 
-        self.log = LogManager('log.txt')
-    
-    def _saveToCachedJson(self, data):
-        cachedJson = JsonManager(self.cachedFile, *self.headerList)
-        cachedData = cachedJson.loadJsonFile()
-        if cachedData == -1:
-            self.log.logDebugMessage('GoldPricedInSilver Class, _saveToCachedJson(): FileName '+ self.cachedFile + ' not found!!')
-        else:
-            self.processor.setAttributes(cachedData['sum'], cachedData['priceList'], cachedData['priceListNegative'])
-            cachedJson.addToJsonFile(data)    
-        
-    def _getCachedJson(self):
-        cachedJson = JsonManager(self.cachedFile, *self.headerList)
-        cachedData = cachedJson.loadJsonFile()
-        if cachedData == -1:
-            self.log.logDebugMessage('GoldPricedInSilver Class, _saveToCachedJson(): FileName '+ self.cachedFile + ' not found!!')
-        else:
-            self.processor.setAttributes(cachedData['sum'], cachedData['priceList'], cachedData['priceListNegative'])
+FIVE_MINUTES = 60*5
 
-    def _clearCacheFile(self):
-        self.processor.resetProcessor()
-        sum, priceList, priceListNegative = self.processor.getAttributes()
-        clearedData = {}
-        clearedData['sum'] = sum
-        clearedData['priceList'] = priceList
-        clearedData['priceListNegative'] = priceListNegative
-        return clearedData
-        
-    def _updatedJsonData(self, list, *args):
-        data = {}
-        for arg in args:
-            data[arg] = list[arg]
-        return data
-    
-    def _createPriceDictionary(self):
-        maxPrice,minPrice,avgPrice = self.processor.getMaxMinAveragePrices()
-        newData = {}
-        newData['Date'] = '{:%m-%d-%Y}'.format(datetime.date.today())
-        newData['Average'] = avgPrice
-        newData['Maximum'] = maxPrice
-        newData['Minimum'] = minPrice
-        return newData
-    
-    def addNewPrice(self):
-        try:
-            self._getCachedJson()
-            results = self.processor.addNewPrice()
-        except Exception as err:
-            self.log.logDebugMessage('GoldPricedInSilver class, addNewPrice():Failed to retrieve data due to down server')
-        else:
-            newData = self._updatedJsonData(results, *self.headerList)
-            self._saveToCachedJson(newData)
+class DaysOfWeek(Enum):
+    MONDAY = 0
+    TUESDAY = 1
+    WEDNESDAY = 2
+    THURSDAY = 3
+    FRIDAY = 4
+    SATURDAY = 5
+    SUNDAY = 6
 
-    def saveNewData(self):
-        self._getCachedJson()
-        newData = self._createPriceDictionary()
-        jsonData = self.jsonManager.loadJsonFile()
-        jsonData[self.headerTitle].append(newData)
-        self.jsonManager.addToJsonFile(jsonData)
-        clearedData = self._clearCacheFile()
-        self._saveToCachedJson(clearedData)
+
+def main():
+
+    cachedfile = 'cachedData.json'
+    templatefile = 'dataTemplate.json'
+    api = 'apiLinks.json'
+    dataFile = 'goldsilverprice.json'
+
+    while True:
+
+        today = datetime.date.today()
+
+        if today.weekday() not in (DaysOfWeek.SATURDAY,DaysOfWeek.SUNDAY):   
+            time.sleep(FIVE_MINUTES)
+            #collect data every 5 minutes (cachedData Very important)
+            #only when date changes from Monday -> Tuesday (for example)
+            #data from cachedData gets calculated to store the average, max, and min price 
+            # into goldsilverprice.json file
+            # want the log manager here at this level to handle saving exception errors from lower classes. 
+            # May need to build up goldSilverPrice class again depending how complex this function gets... 
+
+
+
+if __name__ == '__main__':
+    main()
+

@@ -24,6 +24,9 @@ class JsonManager(FileManager):
     
     @staticmethod
     def addToFile(fileName, data):
-        with open(fileName, "w") as write_file:
-            json.dump(data, write_file, indent=4)
-        write_file.close()        
+        try:
+            with open(fileName, "w") as write_file:
+                json.dump(data, write_file, indent=4)
+            write_file.close()
+        except Exception as error:
+            return error        

@@ -5,7 +5,6 @@ the use of the ThreadPoolExecutor function from the concurrent.futures library.
 import time
 import concurrent.futures
 import requests
-from main.logManager import LogManager # this line should be removed
 from abc import abstractmethod
 
 class PriceCollector:
@@ -22,8 +21,6 @@ class ForexPriceCollector(PriceCollector, DataCollector):
         self.__log = log
         #self.__log = LogManager('log.txt')  # this line should be removed
 
-    # TODO: suppose you use a different API....  this stucture maybe irrelevant (you want this to cover anything you put in here)!!!
-    # This could change if a different API stucture changes, you want to add whatever you want without changing this code that much, Think OCP!!!
     def _getData(self) -> float:
         response = requests.get(self.__apiLinks)    
         if response.ok:
@@ -51,7 +48,7 @@ class ForexPriceCollector(PriceCollector, DataCollector):
                     timeElapsed = currentTime - beginningTime
                     priceResults.clear()
                     if timeElapsed >= 240.0:
-                        self.__log.logDebugMessage('PriceCollector Class, getPricing(): Could not get pricing within 4 minutes')
+                        self.__log.logDebugMessage('PriceCollector Class, getPricing(): Could not get pricing within 4 minutes')  # TODO: How to move that to higher level
                         priceResults = err
                     continue
                 else:

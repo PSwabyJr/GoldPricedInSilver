@@ -16,10 +16,8 @@ class DataCollector:
     def _getData(self, *args): pass
 
 class ForexPriceCollector(PriceCollector, DataCollector):
-    def __init__(self, apiLinks, log):
+    def __init__(self, apiLinks):
         self.__apiLinks = apiLinks
-        self.__log = log
-        #self.__log = LogManager('log.txt')  # this line should be removed
 
     def _getData(self) -> float:
         response = requests.get(self.__apiLinks)    
@@ -48,8 +46,7 @@ class ForexPriceCollector(PriceCollector, DataCollector):
                     timeElapsed = currentTime - beginningTime
                     priceResults.clear()
                     if timeElapsed >= 240.0:
-                        self.__log.logDebugMessage('PriceCollector Class, getPricing(): Could not get pricing within 4 minutes')  # TODO: How to move that to higher level
-                        priceResults = err
+                        pass
                     continue
                 else:
                     failedAPICall = False

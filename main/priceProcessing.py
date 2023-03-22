@@ -1,10 +1,4 @@
-'''
-** Will need to be refactored (Violates SRP) **
-PriceProcessor class used to calculated the average, maximum and 
-minimum prices. The prices collected will be stored in a Heap structure. 
-'''
 import heapq
-from main.priceCollector import ForexPriceCollector
 from abc import abstractclassmethod
 
 class PriceMinMaxAvg:
@@ -27,12 +21,6 @@ class PriceMinMaxAvg:
         heapq.heappush(self.__priceList,newValue)
         newValue*=-1
         heapq.heappush(self.__priceListNegative,newValue)
-
-    def getMinHeap(self)->list:
-        return self.__priceList
-
-    def getMaxHeap(self)->list:
-        return self.__priceListNegative    
     
     def resetHeap(self):
         self.__priceList.clear()
@@ -49,10 +37,7 @@ class PriceAverage:
     
     def getAverage(self)-> int:        
         return self.__sum/self.__num_of_times_added
-    
-    def getSum(self) -> int:
-        return self.__sum
-    
+        
     def reset(self):
         self.__sum = 0.0
         self.__num_of_times_added = 0
@@ -70,26 +55,27 @@ class ForexPriceProcessor(Processor):
     __priceAverage = PriceAverage()
     __priceHeap = PriceMinMaxAvg()
 
-    def __init__(self, priceCollector, log):        
+    def __init__(self, priceCollector):        
         self.priceCollector = priceCollector
-        self.log = log
-        # self.priceCollector = ForexPriceCollector(forexLinks)
-        #self.log = LogManager('log.txt')  Need to go should be in a different class for logging information
     
-    def resetProcessor(self):
+    def __resetProcessor(self):
         self.__priceHeap.resetHeap()
         self.__priceAverage.reset()
-    
+
+    # TODO: What happens if servers are down for the whole day
+    def getPricing(self) -> tuple:
+        averagePrice = self.__priceAverage.getAverage()
+        minimumPrice = self.__priceHeap.getMinimumPrice()
+        maximumPrice = self.__priceHeap.getMaximumPrice()
+        self.__resetProcessor()
+        return averagePrice, minimumPrice, maximumPrice
+
     def processInfo(self):
         try:
             firstPrice,secondPrice = self.priceCollector.getPricing()
         except Exception as err:
-            self.log.logDebugMessage('PriceProcessor Class, addNewPrice():Failed to retrieve data due to down server')
-            return err
+            return f'{err}: ForexPriceProcessor.processInfo()-> Failed to retrieve data due to down server'            
         else:
-            self.addToList(firstPrice/secondPrice)
-            data  = {}
-            data['sum'] = self.__priceAverage.getSum()
-            data['priceList'] = self.__priceHeap.getMinHeap() #TODO: why do we need this again
-            data['priceListNegative'] = self.__priceHeap.getMaxHeap() #TODO: why do we need this again
-            return data
+            price = firstPrice/secondPrice
+            self.__priceAverage.addNewPrice(price)
+            self.__priceHeap.addToHeap(price)

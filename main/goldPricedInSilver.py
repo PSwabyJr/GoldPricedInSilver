@@ -8,16 +8,21 @@ from priceProcessing import ForexPriceProcessor
 from priceCollector import ForexPriceCollector
 
 FIVE_MINUTES = 60*5
+EST_TIMEZONE = pytz.timezone('US/Eastern')
 
 def getDate()-> str:
     today = datetime.datetime.today()
     formatted_date = today.strftime("%m-%d-%Y")
     return formatted_date
 
+def getUpdatedData(fileName,data):
+    updatedData = JsonManager.loadFile(fileName)
+    updatedData.update(data)
+    return updatedData
+
 def update_file(fileName, data):
-    savedData = JsonManager.loadFile(fileName)
-    savedData.update(data)
-    JsonManager.addToFile(savedData)
+    updatedData = getUpdatedData(fileName, data)
+    JsonManager.addToFile(updatedData)
     
 def getAPILink(fileName):
     try:
@@ -29,6 +34,32 @@ def getAPILink(fileName):
 
     return apiLink
 
+def hasDateChanged() -> bool:
+    # get the current date and time in EST
+    now = datetime.datetime.now(EST_TIMEZONE)
+    weekday = now.weekday() 
+    if weekday != DaysOfWeek.SUNDAY.value:
+        return True
+    else:
+        return False    
+
+def isForexMarketActive() -> bool:
+    now = datetime.datetime.now(EST_TIMEZONE)
+    weekday = now.weekday()
+
+    # Forex market trades between Sunday 5 pm EST and Friday 4 pm EST
+    if weekday == DaysOfWeek.SUNDAY.value:
+        if now.time() >= datetime.time(hour= 17, tzinfo= EST_TIMEZONE):
+            return True
+    
+    elif weekday >= DaysOfWeek.MONDAY.value and weekday <= DaysOfWeek.THURSDAY.value:
+        return True
+    
+    elif weekday == DaysOfWeek.FRIDAY.value:
+        if now.time() <= datetime.time(hour= 16, tzinfo= EST_TIMEZONE):
+            return True
+    else:
+        return False
     
 def main():
 
@@ -38,20 +69,17 @@ def main():
     apiLinks = getAPILink(api)
     priceCollector = ForexPriceCollector(apiLinks)
     priceProcessor = ForexPriceProcessor(priceCollector)
-
-    est_timezone = pytz.timezone('US/Eastern')
-    today = datetime.datetime.now(est_timezone).weekday()
+   
 
     while True:
 
         time.sleep(FIVE_MINUTES)
         # get the current date and time in EST
-        now = datetime.datetime.now(est_timezone)
+        now = datetime.datetime.now(EST_TIMEZONE)
         weekday = now.weekday()        
         
         #check to see if date changed. If changed during trading hours, updated json file with average, min, max prices
-        if weekday != today:
-            if weekday != DaysOfWeek.SUNDAY.value:
+        if hasDateChanged():
                 averagePrice, minimumPrice, maximumPrice = priceProcessor.getPricing()
                 
                 data = {
@@ -62,22 +90,10 @@ def main():
                 }
                 update_file(dataFile, data)
 
-            today = weekday
-        
-        # Forex market trades between Sunday 5 pm EST and Friday 4 pm EST
-        if weekday == DaysOfWeek.SUNDAY.value:
-            if now.time() >= datetime.time(hour= 17, tzinfo= est_timezone):
-                priceProcessor.processInfo()
-        
-        elif weekday >= DaysOfWeek.MONDAY.value and weekday <= DaysOfWeek.THURSDAY.value:
+            #today = weekday
+
+        if isForexMarketActive():
             priceProcessor.processInfo()
-        
-        elif weekday == DaysOfWeek.FRIDAY.value:
-            if now.time() <= datetime.time(hour= 16, tzinfo= est_timezone):
-                priceProcessor.processInfo()
-        
-        else:
-            pass
 
 
         # TODO: Notes to be cognizant of..... 

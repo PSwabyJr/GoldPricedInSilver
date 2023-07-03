@@ -5,10 +5,12 @@ from abc import ABC
 class FileManager(ABC):
 
     @staticmethod
-    def loadFile(filename): pass
+    def loadFile(filename): 
+        pass
 
     @staticmethod
-    def addToFile(filename): pass
+    def addToFile(filename): 
+        pass
 
 class JsonManager(FileManager):
 

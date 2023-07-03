@@ -13,8 +13,8 @@ class DataCollector:
     @abstractmethod
     def _getData(self, *args): pass
 
+# TODO: Make this class more modular so it's not hardcoded... what happens if they change their structure or you want to try something else
 class ForexDataFeedSwissquote:
-
     def retrieveRequestedPriceFromDataFeed(response):
         priceData = response.json()
         MT5ServerPrices = priceData[0]['spreadProfilePrices']

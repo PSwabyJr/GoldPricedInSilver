@@ -30,7 +30,7 @@ class ForexPriceCollector(PriceCollector, DataCollector):
     def __init__(self, apiLinks, apiDataFeed):
         self._apiLinks = apiLinks
         self._dataFeed = apiDataFeed
-        self._beginningTime = 0.0
+        self._beginningTimeInSeconds = 0.0
 
     def _getparsedPricingFromDataFeed(self,response):
         price = self._dataFeed.retrieveRequestedPriceFromDataFeed(response)
@@ -46,7 +46,7 @@ class ForexPriceCollector(PriceCollector, DataCollector):
 
     def _getNewTimeElapsedInSeconds(self):
         currentTime = time.time()
-        timeElapsedInSeconds = currentTime - self._beginningTime
+        timeElapsedInSeconds = currentTime - self._beginningTimeInSeconds
         return timeElapsedInSeconds
     
     def _getRetrievedPricingFromFeed(self):
@@ -63,7 +63,7 @@ class ForexPriceCollector(PriceCollector, DataCollector):
     def getPricing(self) -> list:
         IsStillWaitingForPricing = True
         priceResults = []
-        self._beginningTime = time.time()
+        self._beginningTimeInSeconds = time.time()
         
         while IsStillWaitingForPricing:
             try:

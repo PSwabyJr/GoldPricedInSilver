@@ -102,6 +102,14 @@ def main():
         # consider ways to refactor this stuff as well
 
 
+# TODO: This class will depend on abstractions, not the implementations themselves.
+class GoldPricedInSilver:
+    def __init__(self) -> None:
+        pass
+
+    def start(self):
+        pass
+
 if __name__ == '__main__':
     main()
 

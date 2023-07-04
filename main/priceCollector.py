@@ -5,6 +5,9 @@ import concurrent.futures
 import requests
 from abc import abstractmethod
 
+class RequestError(Exception):
+    pass
+
 class PriceCollector:
     @abstractmethod
     def getPricing(self): pass
@@ -42,7 +45,7 @@ class ForexPriceCollector(PriceCollector, DataCollector):
             price = self._getparsedPricingFromDataFeed(response)
             return price
         else:
-            return None  # TODO: could pass a custom Exception Error to handle the situation if nothing gets returned instead of passing None. (bad practice)
+            raise RequestError(f"Request Unsuccessful. Returned status code {response.status_code} instead of 200!!")
 
     def _getNewTimeElapsedInSeconds(self):
         currentTime = time.time()
@@ -69,7 +72,7 @@ class ForexPriceCollector(PriceCollector, DataCollector):
             try:
                 for result in self._getRetrievedPricingFromFeed():
                     priceResults.append(result)
-            except Exception as err:  # TODO: Will need to create a custom Exception for better readability
+            except RequestError as err:
                 priceResults.clear()
                 if self._isTimeUpAfterMultipleAPICalls():
                     IsStillWaitingForPricing = False

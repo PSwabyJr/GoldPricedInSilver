@@ -1,6 +1,8 @@
 import heapq
 from abc import abstractclassmethod
 
+# TODO: classes PriceMinMaxAvg and PriceAverage should implement some interface/abstract class... in my opionion, these
+# two classes plus the abstract class I'm making will probably belong in a different file. :) We can do that tommorrow.... :)
 class PriceMinMaxAvg:
     __priceList = []   # minHeap for storing prices. Used to determine minimum price stored
     __priceListNegative = [] #maxHeap for storing prices. Used to determine maximum priced stored
@@ -52,8 +54,8 @@ class Processor:
 
 class ForexPriceProcessor(Processor):
     
-    __priceAverage = PriceAverage()
-    __priceHeap = PriceMinMaxAvg()
+    __priceAverage = PriceAverage()  # TODO: Will get rid of this (Tightly coupled)
+    __priceHeap = PriceMinMaxAvg() # TODO: Will get rid of this (Tightly coupled)
 
     def __init__(self, priceCollector):        
         self.priceCollector = priceCollector

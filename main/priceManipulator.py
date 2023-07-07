@@ -14,52 +14,47 @@ class PriceManipulator(ABC):
     def getPriceDataAfterManipulation(self):
         pass
 
-# TODO: PriceMax can inherit from PriceMin since they use the same structure, look into tomorrow
 class PriceMin(PriceManipulator):
     def __init__(self):
-        self._priceMinHeap= []
-        heapq.heapify(self._priceMinHeap)
+        self._priceHeap= []
+        heapq.heapify(self._priceHeap)
     
-    def _getMinimumPrice(self):
-        minPrice = self._priceMinHeap[0]
+    def _getHeadOfHeap(self):
+        return self._priceHeap[0]
+    
+    def __getMinimumPrice(self):
+        minPrice = self._getHeadOfHeap()
         return minPrice
 
     def _addPriceToHeap(self, price):
-        heapq.heappush(self._priceMinHeap,price)
+        heapq.heappush(self._priceHeap,price)
     
     def reset(self):
-        self._priceMinHeap.clear()
+        self._priceHeap.clear()
 
     def addPriceForManipulation(self, price):
         self._addPriceToHeap(price)
     
     def getPriceDataAfterManipulation(self):
-        minPrice = self._getMinimumPrice()
+        minPrice = self.__getMinimumPrice()
         return minPrice
 
-class PriceMax(PriceManipulator):
-    def __init__(self):
-        self._priceMaxHeap= []
-        heapq.heapify(self._priceMaxHeap)
+class PriceMax(PriceMin):
+    # multiplying by -1 ensures we create a max heap using 
+    # the heapq library to get maximum price
     
-    def _getMaximumPrice(self):
-        maxPrice = -1*self._priceMaxHeap[0]
+    def __getMaximumPrice(self):
+        maxPrice = -1*self._getHeadOfHeap()
         return maxPrice
 
     def _addPriceToHeap(self, price):
         price*=-1
-        heapq.heappush(self._priceMaxHeap,price)
-    
-    def reset(self):
-        self._priceMaxHeap.clear()
-
-    def addPriceForManipulation(self, price):
-        self._addPriceToHeap(price)
+        heapq.heappush(self._priceHeap,price)
     
     def getPriceDataAfterManipulation(self):
-        maxPrice = self._getMaximumPrice()
-        return maxPrice
-
+        priceData = self.__getMaximumPrice()
+        return priceData
+    
 class PriceAverage(PriceManipulator):
     def __init__(self):
         self._sum= 0.0

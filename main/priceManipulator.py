@@ -36,13 +36,13 @@ class PriceMin(PriceManipulator):
         self._addPriceToHeap(price)
     
     def getPriceDataAfterManipulation(self):
-        minPrice = self.__getMinimumPrice()
-        return minPrice
+        priceData = self.__getMinimumPrice()
+        return priceData
 
 class PriceMax(PriceMin):
     # multiplying by -1 ensures we create a max heap using 
     # the heapq library to get maximum price
-    
+
     def __getMaximumPrice(self):
         maxPrice = -1*self._getHeadOfHeap()
         return maxPrice

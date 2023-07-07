@@ -64,9 +64,9 @@ class APITimeout:
     
 class ForexPriceCollector(PriceCollector):
     
-    def __init__(self, apiDataFeed: PriceDataFeed):
+    def __init__(self, apiDataFeed: PriceDataFeed, timeout: APITimeout):
         self._dataFeed = apiDataFeed
-        self._timeout = APITimeout()
+        self._timeout = timeout
         
     def getPricing(self) -> list:
         stillWaitingForPricing = True

@@ -1,83 +1,50 @@
 import heapq
 from abc import abstractclassmethod
-
-# TODO: classes PriceMinMaxAvg and PriceAverage should implement some interface/abstract class... in my opionion, these
-# two classes plus the abstract class I'm making will probably belong in a different file. :) We can do that tommorrow.... :)
-class PriceMinMaxAvg:
-    __priceList = []   # minHeap for storing prices. Used to determine minimum price stored
-    __priceListNegative = [] #maxHeap for storing prices. Used to determine maximum priced stored
-
-    def __init__(self):
-        heapq.heapify(self.__priceList)
-        heapq.heapify(self.__priceListNegative)
-    
-    def getMaximumPrice(self):
-        maxPrice = -1*self.__priceListNegative[0]
-        return maxPrice
-    
-    def getMinimumPrice(self):
-        minPrice = self.__priceList[0]
-        return minPrice
-
-    def addToHeap(self,newValue):
-        heapq.heappush(self.__priceList,newValue)
-        newValue*=-1
-        heapq.heappush(self.__priceListNegative,newValue)
-    
-    def resetHeap(self):
-        self.__priceList.clear()
-        self.__priceListNegative.clear()
-    
-
-class PriceAverage:
-    __sum = 0.0
-    __num_of_times_added = 0
-
-    def addNewPrice(self, price):
-        self.__sum += price
-        self.__num_of_times_added += 1
-    
-    def getAverage(self)-> int:        
-        return self.__sum/self.__num_of_times_added
-        
-    def reset(self):
-        self.__sum = 0.0
-        self.__num_of_times_added = 0
+from priceManipulator import PriceManipulator
+from priceCollector import PriceCollector
 
 class Processor:
     @abstractclassmethod
-    def resetProcessor(self): pass
+    def resetProcessor(self): 
+        pass
 
     @abstractclassmethod
-    def processInfo(self, *args): pass
+    def processData(self): 
+        pass
 
-
-class ForexPriceProcessor(Processor):
-    
-    __priceAverage = PriceAverage()  # TODO: Will get rid of this (Tightly coupled)
-    __priceHeap = PriceMinMaxAvg() # TODO: Will get rid of this (Tightly coupled)
-
-    def __init__(self, priceCollector):        
+class ForexGoldSilverPriceProcessor(Processor):
+    def __init__(self, priceCollector: PriceCollector, *priceManipulators: PriceManipulator):        
         self.priceCollector = priceCollector
+        self._priceManipulators = []
+        self._addPriceManipulators(*priceManipulators)
     
-    def __resetProcessor(self):
-        self.__priceHeap.resetHeap()
-        self.__priceAverage.reset()
+    def _addPriceManipulators(self, *priceManipulators):        
+        for priceManipulator in priceManipulators:
+            self._priceManipulators.append(priceManipulator)
+    
+    def resetProcessor(self):
+        for priceManipulator in self._priceManipulators:
+            priceManipulator.reset()
+    
+    def processData(self) -> list:
+        priceResults = []
+        
+        for priceManipulator in self._priceManipulators:
+            priceData = priceManipulator.getPriceDataAfterManipulation()
+            priceResults.append(priceData)
+        
+        self.resetProcessor()
+        return priceResults
+    
+    def _addNewPrice(self, price):
+        for priceManipulator in self._priceManipulators():
+            priceManipulator.addPriceForManipulation(price)
 
-    # TODO: What happens if servers are down for the whole day
-    def getPricing(self) -> tuple:
-        averagePrice = self.__priceAverage.getAverage()
-        minimumPrice = self.__priceHeap.getMinimumPrice()
-        maximumPrice = self.__priceHeap.getMaximumPrice()
-        self.__resetProcessor()
-        return averagePrice, minimumPrice, maximumPrice
-
-    def processInfo(self):
+    def getPricing(self):
         try:
-            firstPrice,secondPrice = self.priceCollector.getPricing()
+            goldPrice,silverPrice = self.priceCollector.getPricing()
         except Exception as err:
-            return f'{err}: ForexPriceProcessor.processInfo()-> Failed to retrieve data due to down server'            
+            return f'{err}: ForexGoldSilverPriceProcessor.getPricing()-> Failed to retrieve data due to down server'            
         else:
-            price = firstPrice/secondPrice
-            self.__priceAverage.addNewPrice(price)
-            self.__priceHeap.addToHeap(price)
+            goldPricedInSilver = goldPrice/silverPrice
+            self._addNewPrice(goldPricedInSilver)

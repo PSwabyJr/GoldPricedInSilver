@@ -5,12 +5,19 @@ import concurrent.futures
 import requests
 from abc import abstractmethod, ABC
 
+from main.priceCollector import PriceCollector
+
 class RequestError(Exception):
     pass
 
 class PriceCollector:
     @abstractmethod
     def getPricing(self): 
+        pass
+
+class PriceCollectorBuilder:
+    @abstractmethod
+    def buildPriceCollector(self)-> PriceCollector:
         pass
     
 class PriceDataFeed(ABC):
@@ -86,3 +93,12 @@ class ForexPriceCollector(PriceCollector):
             else:
                 stillWaitingForPricing = False
         return priceResults
+
+class ForexPriceCollectorBuilder(PriceCollectorBuilder):
+    def __init__(self, apiLinks):
+        self._dataFeed = ForexDataFeedSwissquote(apiLinks)
+        self._timeout = APITimeout()
+    
+    def buildPriceCollector(self) -> PriceCollector:
+        return ForexPriceCollector(self._dataFeed, self._timeout)
+    

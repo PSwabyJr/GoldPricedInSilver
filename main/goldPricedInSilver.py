@@ -4,11 +4,12 @@ import pytz
 import time
 from main.days import DaysOfWeek
 from fileManager import JsonManager
-from priceProcessing import ForexPriceProcessor
-from priceCollector import ForexPriceCollector
+from priceProcessing import GoldSilverPriceProcessorBuilder, Processor
+from priceCollector import ForexPriceCollectorBuilder
 
-FIVE_MINUTES = 60*5
-EST_TIMEZONE = pytz.timezone('US/Eastern')
+
+# TODO: Lots of cleanup needed in this file, will need to consider how logManager fits in when something goes wrong
+
 
 def getDate()-> str:
     today = datetime.datetime.today()
@@ -60,55 +61,57 @@ def isForexMarketActive() -> bool:
             return True
     else:
         return False
-    
-def main():
 
-    api = 'apiLinks.json'
-    dataFile = 'goldsilverprice.json'
-
-    apiLinks = getAPILink(api)
-    priceCollector = ForexPriceCollector(apiLinks)
-    priceProcessor = ForexPriceProcessor(priceCollector)
-   
-
-    while True:
-
-        time.sleep(FIVE_MINUTES)
-        # get the current date and time in EST
-        now = datetime.datetime.now(EST_TIMEZONE)
-        weekday = now.weekday()        
-        
-        #check to see if date changed. If changed during trading hours, updated json file with average, min, max prices
-        if hasDateChanged():
-                averagePrice, minimumPrice, maximumPrice = priceProcessor.getPricing()
-                
-                data = {
-                    'Date': getDate(),
-                    'AveragePrice': averagePrice,
-                    'MinimumPrice': minimumPrice,
-                    'MaximumPrice': maximumPrice
-                }
-                update_file(dataFile, data)
-
-            #today = weekday
-
-        if isForexMarketActive():
-            priceProcessor.processInfo()
-
-
-        # TODO: Notes to be cognizant of..... 
-        # want the log manager here at this level to handle saving exception errors from lower classes. 
-        # May need to build up goldSilverPrice class again depending how complex this function gets... 
-        # consider ways to refactor this stuff as well
-
+# TODO: ForexMarketStatus class will handle all (Will utilize Static Methods) the important stuff on activity etc., may put this in a separate file
+class ForexMarketStatus:
+    pass
 
 # TODO: This class will depend on abstractions, not the implementations themselves.
-class GoldPricedInSilver:
-    def __init__(self) -> None:
-        pass
+class GoldPricedInSilverApp:
+    DATA_FILE = 'goldsilverprice.json'
+    FIVE_MINUTES = 60*5
+    EST_TIMEZONE = pytz.timezone('US/Eastern')
+
+    def __init__(self, priceProcessor: Processor):
+        self._priceProcessor = priceProcessor
 
     def start(self):
-        pass
+        while True:
+            # TODO: Will clean this up :)
+            time.sleep(GoldPricedInSilverApp.FIVE_MINUTES)
+            # get the current date and time in EST
+            now = datetime.datetime.now(GoldPricedInSilverApp.EST_TIMEZONE)
+            weekday = now.weekday()        
+
+            #check to see if date changed. If changed during trading hours, updated json file with average, min, max prices
+            if hasDateChanged():
+                    priceResults = self._priceProcessor.processData()
+
+                    data = {
+                        'Date': getDate(),
+                        'AveragePrice': priceResults[0],
+                        'MinimumPrice': priceResults[1],
+                        'MaximumPrice': priceResults[2]
+                    }
+                    update_file(GoldPricedInSilverApp.DATA_FILE, data)
+
+                #today = weekday
+
+            if isForexMarketActive():
+                self._priceProcessor.getPricing()
+
+
+
+def main():
+    api= 'apiLinks.json'
+    apiLinks= getAPILink(api)
+
+    priceCollector = ForexPriceCollectorBuilder(apiLinks).buildPriceCollector()
+    priceProcessor = GoldSilverPriceProcessorBuilder(priceCollector).buildPriceProcessor()
+    app = GoldPricedInSilverApp(priceProcessor)
+    app.start()
+
+
 
 if __name__ == '__main__':
     main()

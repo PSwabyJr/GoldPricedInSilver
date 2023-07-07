@@ -1,9 +1,9 @@
 import heapq
-from abc import abstractclassmethod
-from priceManipulator import PriceManipulator
+from abc import ABC, abstractclassmethod
+from priceManipulator import PriceManipulator, PriceMax, PriceMin, PriceAverage
 from priceCollector import PriceCollector
 
-class Processor:
+class Processor(ABC):
     @abstractclassmethod
     def resetProcessor(self): 
         pass
@@ -12,7 +12,12 @@ class Processor:
     def processData(self): 
         pass
 
-class ForexGoldSilverPriceProcessor(Processor):
+class PriceProcessorBuilder(ABC):
+    @abstractclassmethod
+    def buildPriceProcessor(self) -> Processor:
+        pass
+
+class GoldSilverPriceProcessor(Processor):
     def __init__(self, priceCollector: PriceCollector, *priceManipulators: PriceManipulator):        
         self.priceCollector = priceCollector
         self._priceManipulators = []
@@ -44,7 +49,17 @@ class ForexGoldSilverPriceProcessor(Processor):
         try:
             goldPrice,silverPrice = self.priceCollector.getPricing()
         except Exception as err:
-            return f'{err}: ForexGoldSilverPriceProcessor.getPricing()-> Failed to retrieve data due to down server'            
+            return f'{err}: GoldSilverPriceProcessor.getPricing()-> Failed to retrieve data due to down server'            
         else:
             goldPricedInSilver = goldPrice/silverPrice
             self._addNewPrice(goldPricedInSilver)
+
+class GoldSilverPriceProcessorBuilder(PriceProcessorBuilder):
+    def __init__(self, priceCollector: PriceCollector):
+        self._priceCollector= priceCollector
+        self._priceManipulators = (PriceAverage(), PriceMin(), PriceMax())
+    
+    def buildPriceProcessor(self):
+        return GoldSilverPriceProcessor(self._priceCollector, self._priceManipulators)
+    
+    

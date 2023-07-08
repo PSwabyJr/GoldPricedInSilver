@@ -64,6 +64,9 @@ class GoldPricedInSilverApp:
                     priceResults = self._priceProcessor.processData()
                     save_results(GoldPricedInSilverApp.DATA_FILE, priceResults) # TODO: don't want this class to depend on an outside independentfunction, refactor
                     today = getTodayDate() # TODO: don't want this class to depend on an outside independent function, refactor
+            else:
+                if DaysOfWeekMonitor.hasDateChanged(today):
+                    today = getTodayDate() # for the situation when it's Sunday but the app still thinks today is Saturday
 
 def main():
     api= 'apiLinks.json'

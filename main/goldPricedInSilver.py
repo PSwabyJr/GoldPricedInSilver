@@ -55,7 +55,6 @@ class GoldPricedInSilverApp:
 
     def start(self):
         today = getTodayDate()
-
         while True:
             time.sleep(GoldPricedInSilverApp.FIVE_MINUTES)  
             if ForexMarketStatus.isMarketOpened():
@@ -75,8 +74,5 @@ def main():
     app = GoldPricedInSilverApp(priceProcessor)
     app.start()
 
-
-
 if __name__ == '__main__':
     main()
-

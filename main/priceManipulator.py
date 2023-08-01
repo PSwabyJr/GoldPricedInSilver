@@ -36,7 +36,10 @@ class PriceMin(PriceManipulator):
         self._addPriceToHeap(price)
     
     def getPriceDataAfterManipulation(self):
-        priceData = self.__getMinimumPrice()
+        try:
+            priceData = self.__getMinimumPrice()
+        except IndexError:
+            priceData = 0.0            
         return priceData
 
 class PriceMax(PriceMin):
@@ -52,7 +55,10 @@ class PriceMax(PriceMin):
         heapq.heappush(self._priceHeap,price)
     
     def getPriceDataAfterManipulation(self):
-        priceData = self.__getMaximumPrice()
+        try:
+            priceData = self.__getMaximumPrice()
+        except IndexError:
+            priceData = 0.0
         return priceData
     
 class PriceAverage(PriceManipulator):

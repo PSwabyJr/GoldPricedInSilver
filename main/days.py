@@ -1,5 +1,6 @@
 # days.py
 import pytz
+import time
 from enum import Enum
 from datetime import datetime
 
@@ -62,3 +63,23 @@ class DaysOfWeekMonitor:
             return True
         else:
             return False
+
+class APITimeout:
+
+    def __init__(self, maxAllowedElapsedTimeInSeconds = 240.0):
+        self._maxAllowedElapsedTimeInSeconds = maxAllowedElapsedTimeInSeconds
+        self._beginningTimeInSeconds = 0.0
+    
+    def setNewBeginningTimeInSeconds(self, newTimeInSeconds):
+        self._beginningTimeInSeconds = newTimeInSeconds
+
+    def _isTimeElapsedExceedMaximumAllowed(self):
+        currentTimeInSeconds = time.time()
+        timeElapsedInSeconds = currentTimeInSeconds - self._beginningTimeInSeconds
+        if timeElapsedInSeconds >= self._maxAllowedElapsedTimeInSeconds:
+            return True
+        else:
+            return False
+
+    def isTimeUpAfterFailedAttempts(self):
+        return self._isTimeElapsedExceedMaximumAllowed()  

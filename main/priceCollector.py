@@ -4,8 +4,8 @@ import time
 import concurrent.futures
 import requests
 from abc import abstractmethod, ABC
+from days import APITimeout
 
-from main.priceCollector import PriceCollector
 
 class RequestError(Exception):
     pass
@@ -48,26 +48,6 @@ class ForexDataFeedSwissquote(PriceDataFeed):
         priceType = 2
         price = MT5ServerPrices[priceType]['ask']
         return price
-    
-class APITimeout:
-
-    def __init__(self, maxAllowedElapsedTimeInSeconds = 240.0):
-        self._maxAllowedElapsedTimeInSeconds = maxAllowedElapsedTimeInSeconds
-        self._beginningTimeInSeconds = 0.0
-    
-    def setNewBeginningTimeInSeconds(self, newTimeInSeconds):
-        self._beginningTimeInSeconds = newTimeInSeconds
-
-    def _isTimeElapsedExceedMaximumAllowed(self):
-        currentTimeInSeconds = time.time()
-        timeElapsedInSeconds = currentTimeInSeconds - self._beginningTimeInSeconds
-        if timeElapsedInSeconds >= self._maxAllowedElapsedTimeInSeconds:
-            return True
-        else:
-            return False
-
-    def isTimeUpAfterFailedAttempts(self):
-        return self._isTimeElapsedExceedMaximumAllowed()  
     
 class ForexPriceCollector(PriceCollector):
     

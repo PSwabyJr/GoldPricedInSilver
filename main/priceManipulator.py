@@ -72,5 +72,8 @@ class PriceAverage(PriceManipulator):
         self._num_of_times_added += 1
 
     def getPriceDataAfterManipulation(self):
-        average = self._getAverage()
+        try:
+            average = self._getAverage()
+        except ZeroDivisionError:
+            average = 0.0
         return average

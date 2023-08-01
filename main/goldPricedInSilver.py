@@ -4,8 +4,8 @@ from main.days import DaysOfWeekMonitor, getTodayDate
 from main.marketStatus import ForexMarketStatus
 from datetime import datetime
 from fileManager import JsonManager
-from priceProcessing import GoldSilverPriceProcessorBuilder, Processor
-from priceCollector import ForexPriceCollectorBuilder
+from priceProcessing import Processor
+
 
 
 # TODO: Lots of cleanup needed in this file, will need to consider how 
@@ -68,14 +68,3 @@ class GoldPricedInSilverApp:
                 if DaysOfWeekMonitor.hasDateChanged(today):
                     today = getTodayDate() # for the situation when it's Sunday but the app still thinks today is Saturday
 
-def main():
-    api= 'apiLinks.json'
-    apiLinks= getAPILink(api)
-
-    priceCollector = ForexPriceCollectorBuilder(apiLinks).buildPriceCollector()
-    priceProcessor = GoldSilverPriceProcessorBuilder(priceCollector).buildPriceProcessor()
-    app = GoldPricedInSilverApp(priceProcessor)
-    app.start()
-
-if __name__ == '__main__':
-    main()

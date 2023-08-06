@@ -4,8 +4,6 @@ import time
 import concurrent.futures
 import requests
 from abc import abstractmethod, ABC
-from days import APITimeout
-
 
 class RequestError(Exception):
     pass
@@ -51,34 +49,24 @@ class ForexDataFeedSwissquote(PriceDataFeed):
     
 class ForexPriceCollector(PriceCollector):
     
-    def __init__(self, apiDataFeed: PriceDataFeed, timeout: APITimeout):
+    def __init__(self, apiDataFeed: PriceDataFeed):
         self._dataFeed = apiDataFeed
-        self._timeout = timeout
         
     def getPricing(self) -> list:
-        stillWaitingForPricing = True
         priceResults = []
-        self._timeout.setNewBeginningTimeInSeconds(time.time())
-        
-        while stillWaitingForPricing:
-            try:
-                fetchedData = self._dataFeed.getRetrievedPricingFromFeed()
-                for result in fetchedData:
-                    priceResults.append(result)
-            except RequestError as err:
-                priceResults.clear()
-                if self._timeout.isTimeUpAfterFailedAttempts():
-                    stillWaitingForPricing = False
-                continue
-            else:
-                stillWaitingForPricing = False
+        try:
+            fetchedData = self._dataFeed.getRetrievedPricingFromFeed()
+            for result in fetchedData:
+                priceResults.append(result)
+        except RequestError:
+            priceResults.clear()
+            priceResults.append(0)               
         return priceResults
 
 class ForexPriceCollectorBuilder(PriceCollectorBuilder):
     def __init__(self, apiLinks):
         self._dataFeed = ForexDataFeedSwissquote(apiLinks)
-        self._timeout = APITimeout()
     
     def buildPriceCollector(self) -> PriceCollector:
-        return ForexPriceCollector(self._dataFeed, self._timeout)
+        return ForexPriceCollector(self._dataFeed)
     

@@ -48,11 +48,11 @@ class GoldSilverPriceProcessor(Processor):
     def getPricing(self):
         try:
             goldPrice,silverPrice = self.priceCollector.getPricing()
-        except Exception as err:
-            return f'{err}: GoldSilverPriceProcessor.getPricing()-> Failed to retrieve data due to down server'            
+        except Exception:
+            goldPricedInSilver = 0           
         else:
             goldPricedInSilver = goldPrice/silverPrice
-            self._addNewPrice(goldPricedInSilver)
+        self._addNewPrice(goldPricedInSilver)
 
 class GoldSilverPriceProcessorBuilder(PriceProcessorBuilder):
     def __init__(self, priceCollector: PriceCollector):

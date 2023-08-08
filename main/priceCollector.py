@@ -59,8 +59,7 @@ class ForexPriceCollector(PriceCollector):
             for result in fetchedData:
                 priceResults.append(result)
         except RequestError:
-            priceResults.clear()
-            priceResults.append(0)               
+            priceResults.clear()               
         return priceResults
 
 class ForexPriceCollectorBuilder(PriceCollectorBuilder):

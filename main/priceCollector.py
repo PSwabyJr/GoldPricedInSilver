@@ -44,7 +44,6 @@ class PriceDataFeed(ABC):
                 results.append(0)
         return results
         
-
 class ForexDataFeedSwissquote(PriceDataFeed):
     def _parsePriceFromDataFeed(self, response):
         priceData = response.json()

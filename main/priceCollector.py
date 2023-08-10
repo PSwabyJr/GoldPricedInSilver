@@ -26,17 +26,24 @@ class PriceDataFeed(ABC):
     def _parsePriceFromDataFeed(self, response):
         pass
 
-    def _getAPIPriceData(self) -> float:
-        response = requests.get(self._apiLinks)    
+    def _getAPIPriceData(self, apiLinks:str) -> float:
+        response = requests.get(apiLinks)    
         if response.ok:
-            price = self._parsePriceFromDataFeed(response)
-            return price
+            return self._parsePriceFromDataFeed(response)
         else:
-            raise RequestError(f"Request Unsuccessful. Returned status code {response.status_code} instead of 200!!")
+            error_message = f"Request Unsuccessful. Returned status code {response.status_code} instead of 200!!"
+            raise RequestError(error_message)
 
     def getRetrievedPricingFromFeed(self):
+        results = []
         with concurrent.futures.ThreadPoolExecutor() as executor:
-            return executor.map(self._getAPIPriceData(), self._apiLinks)
+            try:
+                for result in executor.map(self._getAPIPriceData, self._apiLinks):
+                    results.append(result)
+            except RequestError:
+                results.append(0)
+        return results
+        
 
 class ForexDataFeedSwissquote(PriceDataFeed):
     def _parsePriceFromDataFeed(self, response):
@@ -53,13 +60,7 @@ class ForexPriceCollector(PriceCollector):
         self._dataFeed = apiDataFeed
         
     def getPricing(self) -> list:
-        priceResults = []
-        try:
-            fetchedData = self._dataFeed.getRetrievedPricingFromFeed()
-            for result in fetchedData:
-                priceResults.append(result)
-        except RequestError:
-            priceResults.clear()               
+        priceResults = self._dataFeed.getRetrievedPricingFromFeed()   
         return priceResults
 
 class ForexPriceCollectorBuilder(PriceCollectorBuilder):

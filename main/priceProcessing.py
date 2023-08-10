@@ -1,6 +1,5 @@
 import heapq
 from abc import ABC, abstractclassmethod
-from priceManipulator import PriceManipulator, PriceMax, PriceMin, PriceAverage
 from priceCollector import PriceCollector
 
 class Processor(ABC):

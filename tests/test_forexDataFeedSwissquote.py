@@ -6,9 +6,7 @@ sys.path.append(os.path.dirname(SCRIPT_DIR))
 from main.priceCollector import ForexDataFeedSwissquote
 from unittest.mock import patch, Mock
 from main.priceCollector import RequestError
-from mockData import forexMockData, silverPriceMockData, goldPriceMockData
-
-#TODO: Revisit, the test made a few false assumptions about the DATA
+from mockData import forexMockData
 
 class TestForexDataFeedSwissquote(unittest.TestCase):
     def test_parsePriceFromDataFeed(self):

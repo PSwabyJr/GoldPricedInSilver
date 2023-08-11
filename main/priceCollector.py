@@ -3,7 +3,6 @@
 import concurrent.futures
 import requests
 from abc import abstractmethod, ABC
-from apiSource import APISource
 
 class RequestError(Exception):
     pass

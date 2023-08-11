@@ -1,64 +1,50 @@
-import heapq
+import statistics
 from abc import ABC, abstractclassmethod
-from priceCollector import PriceCollector
+
+from main.priceRepo import PriceRepo
 
 class Processor(ABC):
     @abstractclassmethod
-    def resetProcessor(self): 
+    def _resetProcessor(self): 
         pass
 
     @abstractclassmethod
     def processData(self): 
         pass
 
-class PriceProcessorBuilder(ABC):
+class PriceProcessor(Processor):
     @abstractclassmethod
-    def buildPriceProcessor(self) -> Processor:
+    def addPrice(self, prices:tuple):
         pass
 
-class GoldSilverPriceProcessor(Processor):
-    def __init__(self, priceCollector: PriceCollector, *priceManipulators: PriceManipulator):        
-        self.priceCollector = priceCollector
-        self._priceManipulators = []
-        self._addPriceManipulators(*priceManipulators)
-    
-    def _addPriceManipulators(self, *priceManipulators):        
-        for priceManipulator in priceManipulators:
-            self._priceManipulators.append(priceManipulator)
-    
-    def resetProcessor(self):
-        for priceManipulator in self._priceManipulators:
-            priceManipulator.reset()
-    
-    def processData(self) -> list:
-        priceResults = []
-        
-        for priceManipulator in self._priceManipulators:
-            priceData = priceManipulator.getPriceDataAfterManipulation()
-            priceResults.append(priceData)
-        
-        self.resetProcessor()
-        return priceResults
-    
-    def _addNewPrice(self, price):
-        for priceManipulator in self._priceManipulators():
-            priceManipulator.addPriceForManipulation(price)
+class GoldSilverPriceProcessor(PriceProcessor):
+    def __init__(self, priceRepo: PriceRepo):
+        self._priceRepo = priceRepo
 
-    def getPricing(self):
-        try:
-            goldPrice,silverPrice = self.priceCollector.getPricing()
-        except Exception:
-            goldPricedInSilver = 0           
+    def _resetProcessor(self):
+        self._priceRepo.reset_price_repo()
+
+    def processData(self) -> tuple:
+        pricesList = self._priceRepo.get_price()
+        if len(pricesList) > 0:
+            meanPrice = statistics.mean(pricesList)
+            minPrice = min(pricesList)
+            maxPrice = max(pricesList)
+            return (minPrice, maxPrice, meanPrice)
         else:
-            goldPricedInSilver = goldPrice/silverPrice
-        self._addNewPrice(goldPricedInSilver)
+            return (0, 0, 0)
+    
+    def _convertgoldpricingintosilverounce(self, price_tuple: tuple) -> float:        
+        try:
+            goldUSDollarPrice = price_tuple[0]
+            silverUSDollarPrice = price_tuple[1]
+            goldPriceInSilverOunces = goldUSDollarPrice / silverUSDollarPrice
+        except ZeroDivisionError:
+            goldPriceInSilverOunces = 0
 
-class GoldSilverPriceProcessorBuilder(PriceProcessorBuilder):
-    def __init__(self, priceCollector: PriceCollector):
-        self._priceCollector= priceCollector
-        self._priceManipulators = (PriceAverage(), PriceMin(), PriceMax())
-    
-    def buildPriceProcessor(self):
-        return GoldSilverPriceProcessor(self._priceCollector, self._priceManipulators)
-    
+        return goldPriceInSilverOunces
+            
+    def addPrice(self, prices: tuple):
+        goldPriceInSilverOunces = self._convertgoldpricingintosilverounce(prices)
+        self._priceRepo.add_price(goldPriceInSilverOunces)
     

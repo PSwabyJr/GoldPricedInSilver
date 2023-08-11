@@ -3,18 +3,13 @@
 import concurrent.futures
 import requests
 from abc import abstractmethod, ABC
-
-
-class APISource:
-    @abstractmethod
-    def send_links(self)->list:
-        pass
+from apiSource import APISource
 
 class RequestError(Exception):
     pass
     
 class PriceDataFeed(ABC):
-    def __init__(self, apiLinks):
+    def __init__(self, apiLinks: list):
         self._apiLinks = apiLinks
         
     @abstractmethod

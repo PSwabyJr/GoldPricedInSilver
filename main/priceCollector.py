@@ -3,13 +3,15 @@
 import concurrent.futures
 import requests
 from abc import abstractmethod, ABC
+from main.apiSource import APISource
 
 class RequestError(Exception):
     pass
-    
+
+
 class PriceDataFeed(ABC):
-    def __init__(self, apiLinks: list):
-        self._apiLinks = apiLinks
+    def __init__(self, apiLinks: APISource):
+        self._apiLinks = apiLinks.get_links()
         
     @abstractmethod
     def _parsePriceFromDataFeed(self, response):
@@ -41,3 +43,8 @@ class ForexDataFeedSwissquote(PriceDataFeed):
         priceType = 2
         price = MT5ServerPrices[priceType]['ask']
         return price
+
+class DataFeedBuilder:
+    @staticmethod
+    def buildForexDataFeedSwissquote(source: APISource):
+        return ForexDataFeedSwissquote(source)

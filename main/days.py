@@ -6,10 +6,6 @@ from datetime import datetime
 
 EST_TIMEZONE = pytz.timezone('US/Eastern')
 
-
-def getTodayDate()->int:
-     return datetime.now(EST_TIMEZONE).weekday()
-
 class DaysOfWeek(Enum):
     MONDAY = 0
     TUESDAY = 1
@@ -19,7 +15,6 @@ class DaysOfWeek(Enum):
     SATURDAY = 5
     SUNDAY = 6
 
-
 class DaysOfWeekMonitor:
     @staticmethod
     def hasDateChanged(today) -> bool:
@@ -28,6 +23,10 @@ class DaysOfWeekMonitor:
             return True
         else:
             return False
+    
+    @staticmethod
+    def getTodayDate()->int:
+        return datetime.now(EST_TIMEZONE).weekday()
     
     @staticmethod
     def isCurrentTimePast5pm(currentTime)->bool:

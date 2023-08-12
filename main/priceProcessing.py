@@ -30,6 +30,7 @@ class GoldSilverPriceProcessor(PriceProcessor):
             meanPrice = statistics.mean(pricesList)
             minPrice = min(pricesList)
             maxPrice = max(pricesList)
+            self._resetProcessor()
             return (minPrice, maxPrice, meanPrice)
         else:
             return (0, 0, 0)
@@ -48,3 +49,8 @@ class GoldSilverPriceProcessor(PriceProcessor):
         goldPriceInSilverOunces = self._convertgoldpricingintosilverounce(prices)
         self._priceRepo.add_price(goldPriceInSilverOunces)
     
+
+class GoldSilverPriceProcessorBuilder:
+    @staticmethod
+    def build():
+        return GoldSilverPriceProcessor(PriceRepo())

@@ -1,70 +1,40 @@
-import sys
+#goldPricedInSilver.py
+
 import time
-from main.days import DaysOfWeekMonitor, getTodayDate
+from main.days import DaysOfWeekMonitor
 from main.marketStatus import ForexMarketStatus
-from datetime import datetime
-from fileManager import JsonManager
-from priceProcessing import Processor
+from priceProcessing import PriceProcessor
+from priceCollector import PriceDataFeed
+from main.priceOutput import PriceOutput
 
 
-
-# TODO: Lots of cleanup needed in this file, will need to consider how 
-# logManager fits in when something goes wrong. 
-# Plus some other TODO added
-
-def getDate()-> str:
-    today = datetime.datetime.today()
-    formatted_date = today.strftime("%m-%d-%Y")
-    return formatted_date
-
-def getUpdatedData(fileName,data):
-    updatedData = JsonManager.loadFile(fileName)
-    updatedData.update(data)
-    return updatedData
-
-def update_file(fileName, data):
-    updatedData = getUpdatedData(fileName, data)
-    JsonManager.addToFile(updatedData)
-
-def save_results(filename, results):
-    data = {
-        'Date': getDate(),
-        'AveragePrice': results[0],
-        'MinimumPrice': results[1],
-        'MaximumPrice': results[2]
-    }
-    update_file(filename, data)
-        
-def getAPILink(fileName):
-    try:
-        forexLinks = JsonManager.loadFile(fileName)
-        apiLink = forexLinks['forexLinks']
-    except Exception as error:
-        hell = f'{error}: fileName does not exist!!!' # TODO: how to pass this to log
-        sys.exit()
-
-    return apiLink
-
-# TODO: This class will depend on abstractions, not the implementations themselves.
 class GoldPricedInSilverApp:
     DATA_FILE = 'goldsilverprice.json'
     FIVE_MINUTES = 60*5
 
-    def __init__(self, priceProcessor: Processor):
+    def __init__(self, priceProcessor: PriceProcessor, dataFeed:PriceDataFeed):
         self._priceProcessor = priceProcessor
+        self._dataFeed = dataFeed
+        self._output = PriceOutput(GoldPricedInSilverApp.DATA_FILE)
+    
+    def _save_results(self):
+        priceData = self._priceProcessor.processData()
+        self._output.save_price_data(priceData)
+
+    def _get_pricing(self):
+        retrievedprices = self._dataFeed.getRetrievedPricingFromFeed()
+        self._priceProcessor.addPrice(retrievedprices)
 
     def start(self):
-        today = getTodayDate()
+        today = DaysOfWeekMonitor.getTodayDate()
         while True:
             time.sleep(GoldPricedInSilverApp.FIVE_MINUTES)  
             if ForexMarketStatus.isMarketOpened():
-                self._priceProcessor.getPricing()
-
+                self._get_pricing()
                 if DaysOfWeekMonitor.hasDateChanged(today):
-                    priceResults = self._priceProcessor.processData()
-                    save_results(GoldPricedInSilverApp.DATA_FILE, priceResults) # TODO: don't want this class to depend on an outside independentfunction, refactor
-                    today = getTodayDate() # TODO: don't want this class to depend on an outside independent function, refactor
+                    self._save_results()
+                    today = DaysOfWeekMonitor.getTodayDate()
             else:
                 if DaysOfWeekMonitor.hasDateChanged(today):
-                    today = getTodayDate() # for the situation when it's Sunday but the app still thinks today is Saturday
+                    today = DaysOfWeekMonitor.getTodayDate() # for the situation when it's Sunday but the app still thinks today is Saturday
 

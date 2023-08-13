@@ -22,7 +22,7 @@ class GoldSilverPriceOutputJSON(PriceOutput):
     def _formatData(self, data:tuple)->dict:  
         
         todaydate = self._getDate()
-        formattedData = {}
+        formattedData = JsonManager.loadFile(self._filename)
 
         formattedData[todaydate] = {
             "priceMin": data[0],

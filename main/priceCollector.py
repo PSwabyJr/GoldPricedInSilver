@@ -10,8 +10,8 @@ class RequestError(Exception):
 
 
 class PriceDataFeed(ABC):
-    def __init__(self, apiLinks: APISource):
-        self._apiLinks = apiLinks.get_links()
+    def __init__(self, apiLinks: list):
+        self._apiLinks = apiLinks
         
     @abstractmethod
     def _parsePriceFromDataFeed(self, response):
@@ -47,4 +47,5 @@ class ForexDataFeedSwissquote(PriceDataFeed):
 class DataFeedBuilder:
     @staticmethod
     def buildForexDataFeedSwissquote(source: APISource):
-        return ForexDataFeedSwissquote(source)
+        apilinks = source.get_links()
+        return ForexDataFeedSwissquote(apilinks)

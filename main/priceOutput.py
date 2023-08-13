@@ -1,7 +1,7 @@
 #priceOutput.py
 import datetime
 from abc import abstractmethod
-from fileManager import JsonManager
+from main.fileManager import JsonManager
 
 
 class PriceOutput:
@@ -20,12 +20,16 @@ class GoldSilverPriceOutputJSON(PriceOutput):
         return formatted_date
     
     def _formatData(self, data:tuple)->dict:  
-        formattedData = {
-            "date": self._getDate(),
+        
+        todaydate = self._getDate()
+        formattedData = {}
+
+        formattedData[todaydate] = {
             "priceMin": data[0],
             "priceMax": data[1],
             "priceAvg": data[2]
         }
+
         return formattedData
 
     def save_price_data(self, data:tuple):

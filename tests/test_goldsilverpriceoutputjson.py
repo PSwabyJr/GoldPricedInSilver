@@ -4,7 +4,7 @@ SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
 sys.path.append(os.path.dirname(SCRIPT_DIR))
 
 from main.priceOutput import GoldSilverPriceOutputJSON
-from unittest.mock import patch, Mock
+from unittest.mock import patch
 from main.fileManager import JsonManager
 
 

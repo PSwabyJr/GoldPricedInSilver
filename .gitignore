@@ -21,4 +21,5 @@ tests/__pycache__/mockData.cpython-39.pyc
 tests/__pycache__/diagnosticAid.cpython-39.pyc
 tests/__pycache__/mockData.cpython-39.pyc
 main/test_gathering_json.py
-main/__pycache__/fileManager.cpython-310.pyc
+main/__pycache__/fileManager.cpython-310.
+test.py

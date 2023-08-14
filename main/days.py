@@ -29,8 +29,10 @@ class DaysOfWeekMonitor:
         return datetime.now(EST_TIMEZONE).weekday()
     
     @staticmethod
-    def isCurrentTimePast5pm(currentTime)->bool:
-        if currentTime.time() >= datetime.time(hour= 17, tzinfo= EST_TIMEZONE):
+    def isCurrentTimePast5pm(currentDateTime:datetime)->bool:
+        currentTime = currentDateTime.time()
+        timeAt5pm = currentTime.replace(hour= 17, minute= 0, second= 0, microsecond= 0, tzinfo= EST_TIMEZONE)
+        if currentTime >= timeAt5pm:
             return True
         else:
             return False
@@ -50,8 +52,10 @@ class DaysOfWeekMonitor:
             return False
     
     @staticmethod
-    def isCurrentTimeNotPast4pm(currentTime)->bool:
-        if currentTime.time() <= datetime.time(hour= 16, tzinfo= EST_TIMEZONE):
+    def isCurrentTimeNotPast4pm(currentDateTime:datetime)->bool:
+        currentTime = currentDateTime.time()
+        timeAt4pm = currentTime.replace(hour= 16, minute= 0, second= 0, microsecond= 0, tzinfo= EST_TIMEZONE)
+        if currentTime <= timeAt4pm:
             return True
         else:
             return False

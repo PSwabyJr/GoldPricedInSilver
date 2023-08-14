@@ -42,6 +42,10 @@ class GoldSilverPriceProcessor(PriceProcessor):
             goldPriceInSilverOunces = goldUSDollarPrice / silverUSDollarPrice
         except ZeroDivisionError:
             goldPriceInSilverOunces = 0
+        except IndexError:
+            goldPriceInSilverOunces = 0
+        except Exception:
+            goldPriceInSilverOunces = 0
 
         return goldPriceInSilverOunces
             

@@ -17,7 +17,7 @@ class DaysOfWeek(Enum):
 
 class DaysOfWeekMonitor:
     @staticmethod
-    def hasDateChanged(today) -> bool:
+    def hasDateChanged(today:int) -> bool:
         currentDay = datetime.now(EST_TIMEZONE).weekday()
         if currentDay != today: 
             return True
@@ -36,14 +36,14 @@ class DaysOfWeekMonitor:
             return False
     
     @staticmethod
-    def isTodaySunday(weekday)-> bool:
+    def isTodaySunday(weekday: int)-> bool:
         if weekday == DaysOfWeek.SUNDAY.value:
             return True
         else:
             return False
     
     @staticmethod
-    def isTodayBetweenMondayandThursday(weekday) -> bool:
+    def isTodayBetweenMondayandThursday(weekday: int) -> bool:
         if weekday >= DaysOfWeek.MONDAY.value and weekday <= DaysOfWeek.THURSDAY.value:
             return True
         else:
@@ -57,7 +57,7 @@ class DaysOfWeekMonitor:
             return False
     
     @staticmethod
-    def isTodayFriday(weekday)-> bool:
+    def isTodayFriday(weekday: int)-> bool:
         if weekday == DaysOfWeek.FRIDAY.value:
             return True
         else:

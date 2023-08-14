@@ -1,93 +1,60 @@
-'''
-PriceProcessor class used to calculated the average, maximum and 
-minimum prices. The prices collected will be stored in a Heap structure. 
-'''
-import heapq
-from main.priceCollector import PriceCollector
-from main.apiLinks import forexLinks
-from main.logManager import LogManager
-class PriceProcessor:
-    def __init__(self):
-        '''
-        sum: Used to determine the daily average price
-        '''
-        self.sum = 0
-        ''' 
-        priceList: minHeap structure for storing prices. Will be used
-        to determine the minimum price stored.
-        '''
-        self.priceList = []
-        '''priceListNegative: maxHeap structure for storing prices. Will be
-        used to determine the maximum price stored. Price entries are multiplied by -1
-        since heapq library only support min Heap structure. 
-        Max price will be determined by multiplying the root of the min heap by -1.
-        '''
-        self.priceListNegative = []
-        heapq.heapify(self.priceList)
-        heapq.heapify(self.priceListNegative)
-        '''
-        priceCollector: the class for retrieveing the price of gold/silver through 
-        Forex feed's (https://forex-data-feed.swissquote.com)  API calls.
-        '''
-        self.priceCollector = PriceCollector(forexLinks)
-        self.log = LogManager('log.txt')
-    
-    def setAttributes(self, sum, priceList, priceListNegative):
-        self.sum = sum
-        self.priceList = priceList
-        self.priceListNegative = priceListNegative
-    
-    def _computeAverage(self):
-        average = self.sum/len(self.priceList)
-        return average
-    
-    def _getMaximumPrice(self):
-        maxPrice = -1*self.priceListNegative[0]
-        return maxPrice
-    
-    def _getMinimumPrice(self):
-        minPrice = self.priceList[0]
-        return minPrice
+import statistics
+from abc import ABC, abstractclassmethod
 
-    def _resetSum(self):
-        self.sum = 0
+from main.priceRepo import PriceRepo
 
-    def _eraseList(self):
-        self.priceList.clear()
-        self.priceListNegative.clear()
+class Processor(ABC):
+    @abstractclassmethod
+    def _resetProcessor(self): 
+        pass
 
-    def _incrementSum(self, newValue):
-        self.sum += newValue
-    
-    def addToList(self,newValue):
-        heapq.heappush(self.priceList,newValue)
-        self._incrementSum(newValue)
-        newValue*=-1
-        heapq.heappush(self.priceListNegative,newValue)    
+    @abstractclassmethod
+    def processData(self): 
+        pass
 
-    def resetProcessor(self):
-        self._eraseList()
-        self._resetSum()
-    
-    def getMaxMinAveragePrices(self):
-        max = self._getMaximumPrice()
-        min = self._getMinimumPrice()
-        avg = self._computeAverage()
-        return max,min,avg
-    
-    def getAttributes(self):
-        return self.sum, self.priceList, self.priceListNegative
+class PriceProcessor(Processor):
+    @abstractclassmethod
+    def addPrice(self, prices:tuple):
+        pass
 
-    def addNewPrice(self):
-        try:
-            firstPrice,secondPrice = self.priceCollector.getPricing()
-        except Exception as err:
-            self.log.logDebugMessage('PriceProcessor Class, addNewPrice():Failed to retrieve data due to down server')
-            return err
+class GoldSilverPriceProcessor(PriceProcessor):
+    def __init__(self, priceRepo: PriceRepo):
+        self._priceRepo = priceRepo
+
+    def _resetProcessor(self):
+        self._priceRepo.reset_price_repo()
+
+    def processData(self) -> tuple:
+        pricesList = self._priceRepo.get_price()
+        if len(pricesList) > 0:
+            meanPrice = statistics.mean(pricesList)
+            minPrice = min(pricesList)
+            maxPrice = max(pricesList)
+            self._resetProcessor()
+            return (minPrice, maxPrice, meanPrice)
         else:
-            self.addToList(firstPrice/secondPrice)
-            data  = {}
-            data['sum'] = self.sum
-            data['priceList'] = self.priceList
-            data['priceListNegative'] = self.priceListNegative
-            return data
+            return (0, 0, 0)
+    
+    def _convertgoldpricingintosilverounce(self, price_tuple: tuple) -> float:        
+        try:
+            goldUSDollarPrice = price_tuple[0]
+            silverUSDollarPrice = price_tuple[1]
+            goldPriceInSilverOunces = goldUSDollarPrice / silverUSDollarPrice
+        except ZeroDivisionError:
+            goldPriceInSilverOunces = 0
+        except IndexError:
+            goldPriceInSilverOunces = 0
+        except Exception:
+            goldPriceInSilverOunces = 0
+
+        return goldPriceInSilverOunces
+            
+    def addPrice(self, prices: tuple):
+        goldPriceInSilverOunces = self._convertgoldpricingintosilverounce(prices)
+        self._priceRepo.add_price(goldPriceInSilverOunces)
+    
+
+class GoldSilverPriceProcessorBuilder:
+    @staticmethod
+    def build():
+        return GoldSilverPriceProcessor(PriceRepo())

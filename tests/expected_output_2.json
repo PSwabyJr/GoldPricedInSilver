@@ -1,0 +1,13 @@
+{
+    "01-01-2021": {
+        "priceMin": 1,
+        "priceMax": 2,
+        "priceAvg": 3
+    },
+
+    "01-02-2021": {
+        "priceMin": 4,
+        "priceMax": 5,
+        "priceAvg": 6
+    }
+}

@@ -1,50 +1,51 @@
-"""
-This script is reponsible for the price of gold and silver concurrently through
-the use of the ThreadPoolExecutor function from the concurrent.futures library.
-"""
-import time
+#priceCollector.py
+
 import concurrent.futures
 import requests
-from main.logManager import LogManager
-class PriceCollector:
-    def __init__(self, apiLinks):
-        self.apiLinks = apiLinks
-        self.log = LogManager('log.txt')
+from abc import abstractmethod, ABC
+from main.apiSource import APISource
 
-    def getForexData(self, apiLink):
-        response = requests.get(apiLink)
-        if response.ok:
-            return response
-        else:
-            return None
+class RequestError(Exception):
+    pass
+
+
+class PriceDataFeed(ABC):
+    def __init__(self, apiLinks: list):
+        self._apiLinks = apiLinks
         
-    def getForexDataPrice(self, apiLink) -> float:
-        priceRequest = self.getForexData(apiLink)
-        priceData = priceRequest.json()
+    @abstractmethod
+    def _parsePriceFromDataFeed(self, response):
+        pass
+
+    def _getAPIPriceData(self, apiLinks:str) -> float:
+        response = requests.get(apiLinks)    
+        if response.ok:
+            return self._parsePriceFromDataFeed(response)
+        else:
+            error_message = f"Request Unsuccessful. Returned status code {response.status_code} instead of 200!!"
+            raise RequestError(error_message)
+
+    def getRetrievedPricingFromFeed(self) -> list:
+        results = []
+        with concurrent.futures.ThreadPoolExecutor() as executor:
+            try:
+                for result in executor.map(self._getAPIPriceData, self._apiLinks):
+                    results.append(result)
+            except RequestError:
+                results.append(0)
+        return results
+        
+class ForexDataFeedSwissquote(PriceDataFeed):
+    def _parsePriceFromDataFeed(self, response):
+        priceData = response.json()
         MT5ServerPrices = priceData[0]['spreadProfilePrices']
         # Price Type: 'Premium'= 0, 'Prime' = 1, 'Standard' = 2
         priceType = 2
         price = MT5ServerPrices[priceType]['ask']
         return price
 
-    def getPricing(self) -> list:
-        failedAPICall = True
-        priceResults = []
-        beginningTime = time.time()
-        timeElapsed = 0.0  #units in seconds
-        while failedAPICall and timeElapsed < 240.0:
-            with concurrent.futures.ThreadPoolExecutor() as executor:
-                try:
-                    for result in executor.map(self.getForexDataPrice, self.apiLinks):
-                        priceResults.append(result)
-                except Exception as err:
-                    currentTime = time.time()
-                    timeElapsed = currentTime - beginningTime
-                    priceResults.clear()
-                    if timeElapsed >= 240.0:
-                        self.log.logDebugMessage('PriceCollector Class, getPricing(): Could not get pricing within 4 minutes')
-                        priceResults = err
-                    continue
-                else:
-                    failedAPICall = False
-        return priceResults
+class DataFeedBuilder:
+    @staticmethod
+    def buildForexDataFeedSwissquote(source: APISource):
+        apilinks = source.get_links()
+        return ForexDataFeedSwissquote(apilinks)

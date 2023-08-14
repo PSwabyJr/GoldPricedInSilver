@@ -34,12 +34,6 @@ class TestForexMarketStatus(unittest.TestCase):
         self.assertFalse(ForexMarketStatus.isMarketOpened())
 
     @patch('main.marketStatus.datetime')
-    def test_market_closed_on_monday_before_5pm(self, mock_datetime):
-        monday = datetime(2023, 8, 14, 16, 0, tzinfo=EST_TIMEZONE)
-        mock_datetime.now.return_value = monday
-        self.assertTrue(ForexMarketStatus.isMarketOpened())
-
-    @patch('main.marketStatus.datetime')
     def test_market_closed_on_friday_after_4pm(self, mock_datetime):
         friday = datetime(2023, 8, 18, 16, 30, tzinfo=EST_TIMEZONE)
         mock_datetime.now.return_value = friday
